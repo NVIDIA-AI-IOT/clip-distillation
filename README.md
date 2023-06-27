@@ -1,8 +1,9 @@
-# Tutorial 2 - Zero-label Image Classifier
+# Jetson CLIP Distillation
 
 <img src="assets/overview.png" height="320"/>
 
-In the previous tutorial, we convered the fundamentals of knowledge distillation,
+In the introduction to knowledge distillation [tutorial](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation), 
+we convered the fundamentals of knowledge distillation,
 and demonstrated some of the important factors that can impact accuracy.  
 
 While that was helpful for learning about how different factors can impact 
