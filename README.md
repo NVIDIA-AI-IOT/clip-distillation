@@ -1,4 +1,4 @@
-# Jetson CLIP Distillation
+# CLIP Knowledge Distillation
 
 <img src="assets/overview.png" height="320"/>
 
