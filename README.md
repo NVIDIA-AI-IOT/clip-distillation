@@ -2,22 +2,23 @@
 
 <img src="assets/overview.png" height="320"/>
 
-In the introduction to knowledge distillation [tutorial](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation), 
-we convered the fundamentals of knowledge distillation,
-and demonstrated some of the important factors that can impact accuracy.  
+Traditionally, developing an image classification model requires curating a dataset of labeled images.  
 
-While that was helpful for learning about how different factors can impact 
-distillation accuracy, the STL10 dataset, at 96x96 resolution with just 10 classes
-isn't really all the practically useful.  But one important thing we learned, is that we can achieve good classification accuracy using feature distillation without
-ground truth labels. We also learned that the accuracy was largely dependent
-on the data used for distillation.
+Recently, Contrastive Language-Image Pre-training (CLIP) models, trained on large, diverse datasets of image, text pairs, enable zero-shot image classification using text prompts rather than labeled data.  
 
-So the remaining challenging in creating a classification model is largely
-how we curate the data and train a model with custom configurations.
+However, CLIP models may not be developed with inference speed and low memory consumption in mind.
 
-In this tutorial we'll demonstrate a streamlined approach for distilling OpenCLIP
-to make a model without using an labeled data.  This tutorial includes a set of tools for curating data and training
-a CLIP model so you can accomplish this task with ease.
+This project demonstrates how you can take a CLIP model, and use it to train an inference-optimized CNN model via knowledge distillation.  The project includes everything from
+
+1. Downloading and curating an unlabeled dataset to use for knowledge distillation
+2. Training a CNN model to mimic an OpenCLIP model
+    - Supports Quantization Aware Training (QAT) for downstream INT8 inference
+    - Supports training to enforce 2:4 structured sparsity with the ASP library
+3. Deployment with NVIDIA TensorRT
+    - Supports INT8 model
+    - Supports acceleration of 2:4 structured sparse models on certain NVIDIA Jetson platforms, like NVIDIA Jetson Orin Nano.
+
+
 
 ## Table of Contents
 
