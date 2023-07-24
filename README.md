@@ -18,7 +18,7 @@ This project demonstrates how you can take a CLIP model, and use it to train an 
     - Supports INT8 model
     - Supports acceleration of 2:4 structured sparse models on certain NVIDIA Jetson platforms, like NVIDIA Jetson Orin Nano.
 
-
+To get started, follow the instructions below.
 
 ## Table of Contents
 
