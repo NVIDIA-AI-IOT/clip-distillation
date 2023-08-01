@@ -3,8 +3,9 @@
 
 <img src="assets/overview.png" height="320"/>
 
-This project enables you to create inference optimized image classification models,
-with zero-labeled data, by distilling OpenCLIP models.
+This repository contains code and instructions that enable you
+to create your own customized image classification models
+with zero-labeled data, by performing knowledge distillation of OpenCLIP models.
 
 It includes,
 
