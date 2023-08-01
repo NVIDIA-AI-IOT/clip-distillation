@@ -41,10 +41,12 @@ To get started, follow the instructions below.
 
 ### Search for relevant image URLs in the LAION database using CLIP filtering
 
-First, let's query for image URLS that match a set of text prompts by using
-the LAION clip retrieval service.
+The first thing we need to do when distilling a model, is obtain data to use for distillation. 
 
-First, create a file ``data/text_prompts.txt`` with the text prompts to query.
+For this task, we'll look for relevant images by searching the LAION database.  We've provided a script to make this simple.
+
+To search for relevant images, first create a file ``data/text_prompts.txt`` with the text prompts to query.
+
 Each prompt should exist on it's own line.
 
 ```txt
@@ -52,7 +54,7 @@ a dog
 a cat
 ```
 
-Next, query the images based on the text prompts.
+Next, call the script to query the images that match the text prompts.
 
 ```bash
 python3 search_clip_images.py \
@@ -64,8 +66,6 @@ python3 search_clip_images.py \
     --append
 ```
 
-> Note: We use our own script rather than clip_retrieval because it does not expose some parameters and limits the number of images downloaded to a larger extent.
-
 For the full set of arguments please type
 
 ```bash
@@ -74,10 +74,9 @@ python3 search_clip_images.py --help
 
 ### Download images from URL file
 
-Next, we call the following script to download images to an output folder.
-Images are assigned a unique ID based on their URL using the uuid library.  
-This allows us to track the association of images with their URLs without
-needing extra metadata or files.
+Now that we've found relevant images to use for distillation, we need to download them.
+
+To do so, we call the following script to download images to an output folder.
 
 ```bash
 python3 download_images.py \
@@ -86,6 +85,9 @@ python3 download_images.py \
     --max_workers 32 \
     --timeout 2
 ```
+
+This script will download images to the folder ``data/images``.  Each image
+will be given a unique filename base on it's URL.  
 
 For the full set of arguments please type
 
@@ -97,8 +99,11 @@ python3 download_images.py --help
 
 ## Step 2 - Compute OpenCLIP embeddings
 
-Now that we've downloaded a set of images, let's compute OpenCLIP embeddings.
-This will speed up training, so we don't have to run CLIP in the training loop.
+The images we downloaded above will be used as inputs to our teacher and student models during distillation.  Unfortunately, it can be slow to execute the teacher during training.  
+
+To speed up this process, we'll pre-compute the outputs of our teacher model so we don't need to execute the teacher model during training.
+
+To do this, call the ``compute_openclip_embeddings.py`` script as follows,
 
 ```bash
 python3 compute_openclip_embeddings.py \
@@ -110,6 +115,8 @@ python3 compute_openclip_embeddings.py \
     --pretrained laion2b_s34b_b79k
 ```
 
+This will write the ouptput embeddings to the folder ``data/embeddings``, with filenames that match the image filenames, except for the file extensions.
+
 > Note: For available model names and pretrained weight identifiers please reference [OpenCLIP Repo](https://github.com/mlfoundations/open_clip/blob/fb72f4db1b17133befd6c67c9cf32a533b85a321/src/open_clip/pretrained.py#L227).
 
 For the full set of arguments please type
@@ -118,10 +125,11 @@ For the full set of arguments please type
 python3 compute_openclip_embeddings.py --help
 ```
 
-
 <a name="step-3"></a>
 
 ## Step 3 - Train the student CNN model to mimic the OpenCLIP model
+
+Now that we have the data to use for knowledge distillation, we can perform the distillation (student model training) by calling the ``distil_model_embeddings.py`` script as follows.
 
 ```bash
 python3 distil_model_embeddings.py \
@@ -132,6 +140,8 @@ python3 distil_model_embeddings.py \
     --output_dim 512 \
     --pretrained
 ```
+
+This will output model checkpoints and information to ``data/models/resnet18``.
 
 For the full set of arguments please type
 
@@ -146,8 +156,13 @@ python3 distil_model_embeddings.py --help
 
 ### Compute text embeddings
 
-Before we can use our distilled model for classification, we need to compute 
-the text embeddings.
+During distillation, we trained our student model to match the *features* of our open-clip model.  However, we're interested in creating a classification model.
+
+To create the zero-shot classification model, we need to generate text embeddings from the text prompts that describe our class labels.
+
+To do so, we use the pre-trained OpenCLIP text encoder.
+
+We call the ``compute_openclip_text_embeddings.py`` script to create the text embeddings.
 
 ```bash
 python3 compute_openclip_text_embeddings.py \
@@ -156,13 +171,11 @@ python3 compute_openclip_text_embeddings.py \
     --model_name ViT-B-32
 ```
 
-The model name should match that in step (3).  The text prompts here match
-those we used for search.  If you distilled the model with other text prompts,
-you could set this to just the prompts you want to use for classification.
+In this instance, we used the same text prompts we used for image search as our text prompts for classification.  
 
 ### Predict single image with PyTorch
 
-To run inference on a single image with PyTorch
+Now that we have computed th text prompts for our image classes, we can perform image classification with our PyTorch model as follows:
 
 ```bash
 python3 predict_pytorch.py \
@@ -173,10 +186,9 @@ python3 predict_pytorch.py \
     --text_prompts data/text_prompts.txt
 ```
 
-
 ### Live demo with camera
 
-To run inference on a live camera feed and print results to terminal
+We can similarily perform inference on a live camera feed as follows:
 
 ```bash
 python3 demo_pytorch.py \
@@ -189,7 +201,9 @@ python3 demo_pytorch.py \
 
 ## Step 5 (advanced) - Train a student model with structured sparsity
 
-### Distil
+The training script offers the ability to train for [structured sparsity](https://developer.nvidia.com/blog/accelerating-inference-with-sparsity-using-ampere-and-tensorrt/).  This can offer additional acceleration when deploying the model on applicable NVIDIA Jetson platforms with TensorRT.
+
+### Train the model with structured sparsity
 
 ```bash
 python3 distil_model_embeddings.py \
@@ -243,7 +257,11 @@ python3 export_onnx.py \
 
 ## Step 6 (advanced) - Train a student with Quantization aware training and INT8 precision
 
-### Distil
+In addition to structured sparsity, another technique we can use for additional performance is by using reduced INT8 precision.  Quantization aware training is a technique to minimize quantization errors introduced when deploying with INT8 precision.  It does so by applying quantization during the model forward pass during training.  This allows the model to adapt to quantization errors during training.  It also allows us to avoid the need for calibration when using post-training quantization.
+
+To distil the model with quantization aware training, follow theses steps
+
+### Train the model with quantization aware training (QAT)
 
 ```bash
 python3 distil_model_embeddings.py \
