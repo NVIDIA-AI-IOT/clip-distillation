@@ -7,7 +7,9 @@ This repository contains code and instructions that enable you
 to create your own customized image classification models
 with zero-labeled data, by performing knowledge distillation of OpenCLIP models.
 
-It includes,
+Even if you don't need an image classifier directly, you may find this project helpful as inspiration for how you can use knowledge distillation to optimized models for inference, or as an example of how to train models with quantization aware training and structured sparsity for inference on NVIDIA Jetson. 
+
+This project includes,
 
 1. Scripts to search and download relevant data from the LAION database to use for distillation
 2. Scripts to distil any OpenCLIP model to any Pytorch image models (timm) CNN model.
