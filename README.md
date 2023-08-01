@@ -66,6 +66,8 @@ python3 search_clip_images.py \
     --append
 ```
 
+This will output a file ``data/image_urls.txt`` that contains the URLs of images matching our text prompt queries.
+
 For the full set of arguments please type
 
 ```bash
