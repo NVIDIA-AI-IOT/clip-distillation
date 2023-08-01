@@ -2,39 +2,40 @@
 
 <img src="assets/overview.png" height="320"/>
 
-Traditionally, developing an image classification model requires curating a dataset of labeled images.  
+This project enables you to create inference optimized image classification models,
+with zero-labeled data, by distilling OpenCLIP models.
 
-Recently, Contrastive Language-Image Pre-training (CLIP) models, trained on large, diverse datasets of image, text pairs, enable zero-shot image classification using text prompts rather than labeled data.  
+It includes,
 
-However, CLIP models may not be developed with inference speed and low memory consumption in mind.
-
-This project demonstrates how you can take a CLIP model, and use it to train an inference-optimized CNN model via knowledge distillation.  The project includes everything from
-
-1. Downloading and curating an unlabeled dataset to use for knowledge distillation
-2. Training a CNN model to mimic an OpenCLIP model
+1. Scripts to search and download relevant data from the LAION database to use for distillation
+2. Scripts to distil any OpenCLIP model to any Pytorch image models (timm) CNN model.
     - Supports Quantization Aware Training (QAT) for downstream INT8 inference
     - Supports training to enforce 2:4 structured sparsity with the ASP library
-3. Deployment with NVIDIA TensorRT
+3. Scripts to run inference with NVIDIA TensorRT
     - Supports INT8 model
     - Supports acceleration of 2:4 structured sparse models on certain NVIDIA Jetson platforms, like NVIDIA Jetson Orin Nano.
 
 To get started, follow the instructions below.
 
-## Table of Contents
+> If you're new to the subject of knowledge distillation, check out our tutorial [jetson-intro-to-distillation](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation)
+> for an introduction to the subject, and inspiration for ways you can use knoweldge
+> distillation in your own projects!
 
-1. Search images using CLIP filtering
-2. Download images from URLs
-3. Compute OpenCLIP embeddings
-4. Compute OpenCLIP text embeddings
-5. Distil OpenCLIP embeddings to Timm Model
-6. Test model on image
-7. Test model on live video
-6. Distil model with structured sparsity
-7. Distil model with Quantization Aware Training (QAT)
-8. Optimize with TensorRT
-9. Demo with TensorRT on live video
+## Instructions
 
-## Search and download images with CLIP filtering
+1. [Step 1 - Search and download relevant unlabeled images to use for distillation](#step-1)
+2. [Step 2 - Pre-compute OpenCLIP embeddings](#step-2)
+3. [Step 3 - Train the student CNN model to mimic the OpenCLIP model](#step-3)
+4. [Step 4 - Run inference using the distilled model](#step-4)
+5. [Step 5 (advanced) - Train a student model with structured sparsity](#step-5)
+6. [Step 6 (advanced) - Train a student with Quantization aware training and INT8 precision](#step-6)
+7. [Next Steps](#next-steps)
+
+<a name="step-1"></a>
+
+## Step 1 - Search and download images with CLIP filtering
+
+### Search for relevant image URLs in the LAION database using CLIP filtering
 
 First, let's query for image URLS that match a set of text prompts by using
 the LAION clip retrieval service.
@@ -67,7 +68,7 @@ For the full set of arguments please type
 python3 search_clip_images.py --help
 ```
 
-## Download images from URL file
+### Download images from URL file
 
 Next, we call the following script to download images to an output folder.
 Images are assigned a unique ID based on their URL using the uuid library.  
@@ -88,8 +89,9 @@ For the full set of arguments please type
 python3 download_images.py --help
 ```
 
+<a name="step-2"></a>
 
-## Compute OpenCLIP embeddings
+## Step 2 - Compute OpenCLIP embeddings
 
 Now that we've downloaded a set of images, let's compute OpenCLIP embeddings.
 This will speed up training, so we don't have to run CLIP in the training loop.
@@ -112,7 +114,10 @@ For the full set of arguments please type
 python3 compute_openclip_embeddings.py --help
 ```
 
-## Distil OpenCLIP embeddings to Timm Model
+
+<a name="step-3"></a>
+
+## Step 3 - Train the student CNN model to mimic the OpenCLIP model
 
 ```bash
 python3 distil_model_embeddings.py \
@@ -130,7 +135,12 @@ For the full set of arguments please type
 python3 distil_model_embeddings.py --help
 ```
 
-## Compute text embeddings
+
+<a name="step-4"></a>
+
+## Step 4 - Run inference using the distilled model
+
+### Compute text embeddings
 
 Before we can use our distilled model for classification, we need to compute 
 the text embeddings.
@@ -146,7 +156,7 @@ The model name should match that in step (3).  The text prompts here match
 those we used for search.  If you distilled the model with other text prompts,
 you could set this to just the prompts you want to use for classification.
 
-## Predict single image with PyTorch
+### Predict single image with PyTorch
 
 To run inference on a single image with PyTorch
 
@@ -160,7 +170,7 @@ python3 predict_pytorch.py \
 ```
 
 
-## Live demo with camera
+### Live demo with camera
 
 To run inference on a live camera feed and print results to terminal
 
@@ -173,7 +183,7 @@ python3 demo_pytorch.py \
     --camera_device 0
 ```
 
-## Train model for structured sparsity 
+## Step 5 (advanced) - Train a student model with structured sparsity
 
 ### Distil
 
@@ -224,7 +234,10 @@ python3 export_onnx.py \
     --use_asp
 ```
 
-## Train model with Quantization Aware Training (QAT)
+
+<a name="step-6"></a>
+
+## Step 6 (advanced) - Train a student with Quantization aware training and INT8 precision
 
 ### Distil
 
@@ -275,3 +288,12 @@ python3 export_onnx.py \
     --use_qat
 ```
 
+<a name="next-steps"></a>
+
+## Next steps
+
+We hope you found this project helpful and that you were able to train your own image classification model, without using any labeled data.  
+
+As a next step, we recommend reading through the source code to see how we used knoweldge distillation in this project.  We also recommend reading the source code to see how you can train a model with the convenient libraries in PyTorch for quantization aware training and structured sparsity, for more optimized inference on Jetson.
+
+If you have any questions, or run into any issues, please let us know by opening an issue on GitHub!
