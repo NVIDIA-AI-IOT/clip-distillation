@@ -1,5 +1,8 @@
 # CLIP Knowledge Distillation
 
+> If you're new to the subject, check out our tutorial [jetson-intro-to-distillation](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation)
+> for an introduction to knowledge distillation!
+
 <img src="assets/overview.png" height="320"/>
 
 This project enables you to create inference optimized image classification models,
@@ -17,9 +20,7 @@ It includes,
 
 To get started, follow the instructions below.
 
-> If you're new to the subject of knowledge distillation, check out our tutorial [jetson-intro-to-distillation](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation)
-> for an introduction to the subject, and inspiration for ways you can use knoweldge
-> distillation in your own projects!
+
 
 ## Instructions
 
