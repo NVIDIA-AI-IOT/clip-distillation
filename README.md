@@ -145,6 +145,8 @@ python3 distil_model_embeddings.py \
 
 This will output model checkpoints and information to ``data/models/resnet18``.
 
+The distilled model we use in this example is resnet18.  This model is highly optimized by TensorRT, and we can readily apply other optimizations like reduced precision and structured sparsity during training.  Please see the additional steps below for more information.
+
 For the full set of arguments please type
 
 ```bash
