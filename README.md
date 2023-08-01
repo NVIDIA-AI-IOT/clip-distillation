@@ -1,7 +1,5 @@
 # CLIP Knowledge Distillation
 
-> If you're new to the subject, check out our tutorial [jetson-intro-to-distillation](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation)
-> for an introduction to knowledge distillation!
 
 <img src="assets/overview.png" height="320"/>
 
@@ -20,6 +18,8 @@ It includes,
 
 To get started, follow the instructions below.
 
+> If you're new to the subject, check out our tutorial [jetson-intro-to-distillation](https://github.com/NVIDIA-AI-IOT/jetson-intro-to-distillation)
+> for an introduction to knowledge distillation!
 
 
 ## Instructions
