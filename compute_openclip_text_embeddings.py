@@ -30,6 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("text_prompts_file", type=str)
     parser.add_argument("output_path", type=str)
     parser.add_argument("--model_name", type=str, default="ViT-B-32")
+    parser.add_argument("--pretrained", type=str, default="laion2b_s34b_b79k")
     args = parser.parse_args()
 
     with open(args.text_prompts_file, 'r') as f:
